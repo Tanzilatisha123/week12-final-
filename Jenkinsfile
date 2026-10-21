@@ -1,29 +1,22 @@
 pipeline {
     agent any
 
-    environment {
-        PYTHON = 'C:\\Users\\Tanzila\\AppData\\Local\\Python\\bin\\python.exe'
-    }
 
     stages {
 
-        stage('Run Selenium Tests with pytest') {
-            steps {
-                echo "Running Selenium Tests using pytest"
+      stage('Run Selenium Tests with pytest') {
+    steps {
+        echo "Running Selenium Tests using pytest"
 
-                // Install dependencies
-                bat "\"%PYTHON%\" -m pip install -r requirements.txt"
+        bat '"C:\\Users\\Tanzila\\AppData\\Local\\Python\\bin\\python.exe" -m pip install -r requirements.txt'
 
-                // Start Flask app in background
-                bat "start /B \"\" \"%PYTHON%\" app.py"
+        bat 'start /B "" "C:\\Users\\Tanzila\\AppData\\Local\\Python\\bin\\python.exe" app.py'
 
-                // Wait for app startup
-                bat "timeout /t 10 /nobreak"
+        bat '"C:\\Users\\Tanzila\\AppData\\Local\\Python\\bin\\python.exe" -c "import time; time.sleep(10)"'
 
-                // Run tests
-                bat "\"%PYTHON%\" -m pytest -v"
-            }
-        }
+        bat '"C:\\Users\\Tanzila\\AppData\\Local\\Python\\bin\\python.exe" -m pytest -v'
+    }
+}
 
         stage('Build Docker Image') {
             steps {
