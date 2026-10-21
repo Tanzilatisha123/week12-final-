@@ -1,27 +1,33 @@
 pipeline {
     agent any
 
-
     stages {
 
-      stage('Run Selenium Tests with pytest') {
-    steps {
-        echo "Running Selenium Tests using pytest"
+        stage('Run Selenium Tests with pytest') {
+            steps {
+                echo "Running Selenium Tests using pytest"
 
-        bat '"C:\\Users\\Tanzila\\AppData\\Local\\Python\\bin\\python.exe" -m pip install -r requirements.txt'
+                // Install dependencies
+                bat '"C:\\Users\\Tanzila\\AppData\\Local\\Python\\bin\\python.exe" -m pip install -r requirements.txt'
 
-        bat 'start /B "" "C:\\Users\\Tanzila\\AppData\\Local\\Python\\bin\\python.exe" app.py'
+                // Remove old webdriver-manager cache/lock files
+                bat 'if exist C:\\Windows\\System32\\config\\systemprofile\\.wdm rmdir /s /q C:\\Windows\\System32\\config\\systemprofile\\.wdm'
 
-        bat '"C:\\Users\\Tanzila\\AppData\\Local\\Python\\bin\\python.exe" -c "import time; time.sleep(10)"'
+                // Start Flask app
+                bat 'start /B "" "C:\\Users\\Tanzila\\AppData\\Local\\Python\\bin\\python.exe" app.py'
 
-        bat '"C:\\Users\\Tanzila\\AppData\\Local\\Python\\bin\\python.exe" -m pytest -v'
-    }
-}
+                // Wait for app startup
+                bat '"C:\\Users\\Tanzila\\AppData\\Local\\Python\\bin\\python.exe" -c "import time; time.sleep(10)"'
+
+                // Run Selenium tests
+                bat '"C:\\Users\\Tanzila\\AppData\\Local\\Python\\bin\\python.exe" -m pytest -v'
+            }
+        }
 
         stage('Build Docker Image') {
             steps {
                 echo "Building Docker Image"
-                bat "docker build -t seleniumdemoapp:v1 ."
+                bat 'docker build -t seleniumdemoapp:v1 .'
             }
         }
 
@@ -43,15 +49,15 @@ pipeline {
             steps {
                 echo "Pushing Docker Image"
 
-                bat "docker tag seleniumdemoapp:v1 tanzila123/sample2026:seleniumtestimage"
-                bat "docker push tanzila123/sample2026:seleniumtestimage"
+                bat 'docker tag seleniumdemoapp:v1 tanzila123/sample2026:seleniumtestimage'
+                bat 'docker push tanzila123/sample2026:seleniumtestimage'
             }
         }
 
         stage('Deploy to Kubernetes') {
             steps {
-                bat "kubectl apply -f deployment.yaml --validate=false"
-                bat "kubectl apply -f service.yaml"
+                bat 'kubectl apply -f deployment.yaml --validate=false'
+                bat 'kubectl apply -f service.yaml'
             }
         }
     }
