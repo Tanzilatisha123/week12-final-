@@ -1,4 +1,3 @@
-C:\\Users\\Tanzila\\AppData\\Local\\Python\\bin\\python.exe'
 pipeline {
     agent any
 
